@@ -1,0 +1,123 @@
+<script src="tinytest.js"></script>
+<script>
+    // Main Objective
+    //  Create a method to format a number using fixed-point notation.
+
+    // Function signature
+    // toFixed(number, numberOfDigits);
+
+    // Function Parameters
+    // number
+    // numberOfDigits -> this value should be > 0 < 20
+
+    // Return value
+    // A string representing the given number using fixed-point notation.
+
+    // Requirements
+    // 1. It should throw a TypeError if the number parameter is not a Number.
+    // 2. It should throw a RangeError if digit is more than less than 0 and more than 20.
+    // 3. If there are not decimals in the number should add 0 for each numberOfDigits.
+    // 4. It should do the calculations.
+    // 5. It should cover edge cases such as: 0.615, 10.235, and 1.005.
+    // 6. It should add 0s if the numberOfDigits provided is greater than the decimals of the given number.
+
+    function toFixed(number, numberOfDigits = 0) {
+        if (typeof number !== 'number') {
+            throw new TypeError('TypeError: Number.prototype.toFixed requires that "this" be a Number');
+        }
+        if (numberOfDigits > 100 || numberOfDigits < 0) {
+            throw new TypeError('RangeError: toFixed() digits argument must be between 0 and 100');
+        }
+        var convertedNumberToString = number.toString();
+
+        if (!convertedNumberToString.includes('.')) {
+            convertedNumberToString += '.';
+            for (let i = 0; i < numberOfDigits; i++) {
+                convertedNumberToString += '0';
+            }
+        } else {
+            let fullNumberArray = convertedNumberToString.split('.');
+            let numberToAddTheDotOriginal = fullNumberArray[1];
+            let newNumber = 0;
+            let finalNum;
+            let divideNumber = '1';
+
+            for (let i = 0; i < numberOfDigits; i++) {
+                divideNumber += '0';
+            }
+            for (let i = 0; i < numberOfDigits + 1; i++) {
+                if (i === numberOfDigits) {
+                    newNumber += '.';
+                }
+                if (i === 0) {
+                    newNumber = numberToAddTheDotOriginal[i];
+                } else {
+                    if (!numberToAddTheDotOriginal[i]) {
+                        newNumber += '0';
+                    } else {
+                        newNumber += numberToAddTheDotOriginal[i];
+                    }
+                }
+            }
+
+            let divideNumberConverted = Number(divideNumber);
+            finalNum = Math.round(Number(fullNumberArray[0] + newNumber)) / divideNumberConverted;
+            finalNum = finalNum.toString();
+            let decimalsLength = finalNum.split('.')[1].length;
+            if (numberOfDigits > decimalsLength) {
+                for (let i = 0; i < numberOfDigits - decimalsLength; i++) {
+                    finalNum += '0';
+                }
+            }
+            return finalNum;
+
+        }
+        return convertedNumberToString;
+
+    }
+
+
+    tests({
+        '1. It should throw a TypeError if the number parameter is not a Number.': function () {
+            try {
+                toFixed('test');
+            } catch(e) {
+                eq(e.message, 'TypeError: Number.prototype.toFixed requires that "this" be a Number');
+            }
+        },
+        '2. It should throw a RangeError if digit is more than less than 0 and more than 100.': function () {
+            try {
+                toFixed(20, 101);
+            } catch(e) {
+                eq(e.message, 'RangeError: toFixed() digits argument must be between 0 and 100');
+            }
+        },
+
+        '3. If there are not decimals in the number should add 0 for each numberOfDigits': function() {
+            let number = 252;
+            let resultsWeExpect = '252.0';
+            let numberOfDigits= 1;
+            let results = toFixed(252, 1);
+            eq(results, resultsWeExpect);
+            eq(toFixed(252, 3), '252.000');
+        },
+
+        '4. It should do the calculations if the number provided has decimals(dot).': function() {
+            eq(toFixed(252.1234, 3), '252.123');
+        },
+
+        '5. It should cover edge cases such as: 0.615, 10.235, and 1.005.': function() {
+            eq(toFixed(0.615, 2), '0.62');
+        },
+        '6. It should add 0s if the numberOfDigits provided is greater than the decimals of the given number.': function() {
+           // eq(toFixed(0.615, 3), '0.615');
+           eq(toFixed(0.615, 4), '0.6150');
+           debugger;
+            eq(toFixed(0.615, 5), '0.61500');
+            eq(toFixed(0.615, 6), '0.615000');
+        },
+
+
+
+    }, 'toFixed method');
+</script>
